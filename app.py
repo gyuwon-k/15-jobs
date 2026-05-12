@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, send_file
-from scrapper import search_incruit
+from scrapper import search_incruit, search_saramin
 from file import save_to_csv
 
 
@@ -12,15 +12,15 @@ def hello_world():
 @app.route("/search")
 def search():
     keyword = request.args.get("keyword")
-    # request.args.get("page")
-    # print(keyword)
-    jobs = search_incruit(keyword,1)
+    request.args.get("page")
+    jobs =  search_incruit(keyword,1) + search_saramin(keyword,1)
+
     return render_template("search.html", jobs = jobs, keyword = keyword)
 
 @app.route("/file")
 def file():
     keyword = request.args.get("keyword")
-    jobs = search_incruit(keyword,1)
+    jobs = search_incruit(keyword,1) + search_saramin(keyword,1)
     save_to_csv(jobs)
     return send_file("downloads.csv", as_attachment=True)
 

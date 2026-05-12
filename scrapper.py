@@ -52,28 +52,35 @@ def search_saramin(keyword, page):
 	
 	for i in range(page+1):
 		page = i
-		response = requests.get("keyword")
-		
 		url = f"https://www.saramin.co.kr/zf_user/search/recruit?searchType=search&keydownAccess=&company_cd=0%2C1%2C2%2C3%2C4%2C5%2C6%2C7%2C9%2C10&searchword={keyword}&panel_type=&search_optional_item=y&search_done=y&panel_count=y&preview=y&recruitPage={page}&recruitSort=relation&recruitPageCount=40&inner_com_type=&show_applied=&quick_apply=&except_read=&ai_head_hunting=&mainSearch=n"
+		headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+					}
+		response = requests.get(url, headers=headers)
+		soup = BeautifulSoup(response.text, "html.parser") #response에 저장된 url 정보중 페이지소스보기 정보를 text메써드로 가져옴. bs4기능으로 html->python 객체로 변환(매써드사용을 위함)
+		lis = soup.find_all("div", class_="item_recruit")
+
+		jobs = []
+		for li in lis:
+			company_tag = li.find("strong", class_="corp_name")
+			company = company_tag.text.strip() if company_tag else "회사명 없음"
+
+			title_tag = li.find("h2", class_="job_tit")
+			a_tag = title_tag.find("a")
+			title = a_tag.text.strip() if title_tag else "공고명 없음"
+			link = "https://www.saramin.co.kr" + a_tag.get("href") if title_tag else "상세보기 페이지 없음"
 
 
+			location_tag = li.find("div", class_="job_condition")
+			location = location_tag.find_all("span")[0].text.strip() if location_tag else "위치정보 없음"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			job_data = {
+				"company" : company,
+				"title" : title,
+				"location": location,
+				"link" : link
+			}
+			jobs.append(job_data)
+	return jobs
 
 

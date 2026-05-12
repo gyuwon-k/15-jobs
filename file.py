@@ -1,5 +1,5 @@
 import csv
-from scrapper import search_incruit
+from scrapper import search_incruit, search_saramin
 
 def save_to_csv(jobs):
 
